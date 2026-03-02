@@ -1,19 +1,40 @@
 pipeline {
     agent any
+    tools {
+        jdk 'jdk17'
+        maven 'maven3'
+    }
+    parameters {
+      string(name: 'sonar_IP', defaultValue: '54.226.11.106', description: 'IP of sonarqube')
+    }
+    environment {
+      SONARQUBE_URL=${params.sonar_IP}
+      SONARQUBE_TOKEN=credentials('Sonar-token')
+    }
     stages {
-        stage('checkout') {
+        stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/ShilpaLB28/maven-project.git', credentialsId: 'git'
+                git branch: 'master',
+                    url: 'https://github.com/ShilpaLB28/Java-mini-project.git'
+            }
+        }
+        stage('Sonarqube Analysis') {
+            steps {
+                dir('webapp') {
+                    sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=JavaMiniProject \
+                    -Dsonar.host.url=$SONARQUBE_URL \
+                    -Dsonar.login=$SONARQUBE_TOKEN
+                    """
+                }
             }
         }
         stage('build') {
             steps {
-                echo "build stage"
-            }
-        }
-        stage('test') {
-            steps {
-                echo "test stage"
+                dir('webapp') {
+                sh 'mvn clean package -DskipTests'
+                }
             }
         }
     }
