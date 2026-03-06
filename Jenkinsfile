@@ -3,7 +3,6 @@ pipeline {
     tools {
         jdk 'jdk21'
         maven 'maven3'
-        git 'Default'
     }
     parameters {
       string(name: 'sonar_IP', defaultValue: '100.54.191.181', description: 'IP of sonarqube')
