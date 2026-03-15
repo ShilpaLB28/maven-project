@@ -15,7 +15,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 git branch: 'master',
-                    url: 'https://github.com/ShilpaLB28/maven-project.git'
+                url: 'https://github.com/ShilpaLB28/maven-project.git'
             }
         }
         stage('Sonarqube Analysis') {
@@ -34,6 +34,13 @@ pipeline {
             steps {
                 dir('webapp') {
                 sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+        stage('Upload to Nexus') {
+            steps {
+                dir('webapp') {
+                    sh 'mvn deploy -DskipTests'
                 }
             }
         }
